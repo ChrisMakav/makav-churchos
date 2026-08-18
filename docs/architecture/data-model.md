@@ -200,7 +200,7 @@ Pattern standard `is_org_member`/`has_permission`. `volunteers.read`/`volunteers
 
 **Limite connue** : seuls les membres avec un `user_id` lié (portail membre) reçoivent réellement une notification — `recipient_count` reflète le segment complet, l'historique affiche séparément "notifiés"/"lus" à partir des lignes `notifications` effectivement créées. Même compromis que `relancerNonConfirmes` (module Bénévoles, `0018`).
 
-**Envois programmés** : cron `/api/cron/send-communications` (toutes les 15 min, voir `vercel.ts`) — même pattern que `budget-alerts` (client service-role, `CRON_SECRET`).
+**Envois programmés** : cron `/api/cron/send-communications` (1x/jour à 7h, voir `vercel.ts` — limite du plan Vercel Hobby à 1 exécution/jour par cron, initialement prévu toutes les 15 min) — même pattern que `budget-alerts` (client service-role, `CRON_SECRET`).
 
 ### RLS et permissions
 Pattern standard. `communications.read`/`communications.write` attribuées à `super_admin`, `org_admin`, `pastor`, et au rôle `communications_manager` ("Responsable communication", seedé dès l'incrément 1 mais resté sans permission câblée jusqu'ici — même situation que `volunteer_manager` en 0018).
