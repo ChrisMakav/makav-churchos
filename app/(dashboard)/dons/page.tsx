@@ -14,7 +14,7 @@ export default async function DonsPage() {
   const { data: donations } = await supabase
     .from("donations")
     .select(
-      "id, amount, currency, given_at, is_anonymous, receipt_number, donation_funds(name), members(first_name, last_name)",
+      "id, amount, currency, given_at, is_anonymous, is_recurring, receipt_number, donation_funds(name), members(first_name, last_name)",
     )
     .eq("organization_id", session.activeOrg.organizationId)
     .order("given_at", { ascending: false });
@@ -31,6 +31,7 @@ export default async function DonsPage() {
     currency: d.currency,
     givenAt: d.given_at,
     receiptNumber: d.receipt_number,
+    isRecurring: d.is_recurring,
   }));
 
   return (

@@ -11,11 +11,15 @@ import { NAV_SECTIONS, SETTINGS_NAV_ITEM } from "./nav-config";
 export function AppSidebar({
   header,
   orgSwitcher,
+  siteSwitcher,
 }: {
   header: ReactNode;
   orgSwitcher: ReactNode;
+  siteSwitcher?: ReactNode;
 }) {
-  const sections = [...NAV_SECTIONS, { label: "Système", items: [SETTINGS_NAV_ITEM] }];
+  const sections = [...NAV_SECTIONS, { labelKey: "nav.systeme" as const, items: [SETTINGS_NAV_ITEM] }];
 
-  return <Sidebar sections={sections} header={header} orgSwitcher={orgSwitcher} />;
+  return (
+    <Sidebar sections={sections} header={header} orgSwitcher={orgSwitcher} siteSwitcher={siteSwitcher} />
+  );
 }

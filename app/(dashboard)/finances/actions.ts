@@ -220,3 +220,28 @@ export async function createIncomeTransaction(
   revalidatePath("/finances/transactions");
   return {};
 }
+
+export async function setTransactionReconciled(
+  organizationId: string,
+  transactionId: string,
+  reconciled: boolean,
+) {
+  await requirePermission(organizationId, "finance.transactions.write");
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { error } = await supabase
+    .from("transactions")
+    .update({
+      is_reconciled: reconciled,
+      reconciled_at: reconciled ? new Date().toISOString() : null,
+      reconciled_by: reconciled ? (user?.id ?? null) : null,
+    })
+    .eq("id", transactionId)
+    .eq("organization_id", organizationId);
+  if (error) throw error;
+  revalidatePath("/finances");
+  revalidatePath("/finances/transactions");
+}

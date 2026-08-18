@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 
 const TABS = [
   { label: "Organisation", href: "/parametres/organisation" },
+  { label: "Sites & campus", href: "/parametres/sites" },
   { label: "Utilisateurs", href: "/parametres/utilisateurs" },
   { label: "Rôles & permissions", href: "/parametres/roles" },
 ];

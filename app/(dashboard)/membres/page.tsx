@@ -4,20 +4,26 @@ import { PageHeader } from "@/components/patterns/page-header";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/session";
+import { getDictionary } from "@/lib/i18n/locale";
 import { MembersList, type MemberRow } from "./members-list";
 
 export default async function MembresPage() {
   const session = await getSession();
   if (!session) return null;
+  const { t } = await getDictionary();
+
+  const activeSiteName = session.siteOptions.find((s) => s.id === session.activeOrg.siteId)?.name;
 
   const supabase = await createClient();
-  const { data: members } = await supabase
+  let query = supabase
     .from("members")
     .select(
       "id, first_name, last_name, email, phone, member_status, families!members_family_id_fkey(name)",
     )
     .eq("organization_id", session.activeOrg.organizationId)
     .order("last_name", { ascending: true });
+  if (session.activeOrg.siteId) query = query.eq("site_id", session.activeOrg.siteId);
+  const { data: members } = await query;
 
   const rows: MemberRow[] = (members ?? []).map((m) => ({
     id: m.id,
@@ -31,12 +37,12 @@ export default async function MembresPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Membres"
-        description={`${rows.length} membre${rows.length > 1 ? "s" : ""}.`}
+        title={t("membres.title")}
+        description={`${rows.length} ${rows.length > 1 ? t("common.members") : t("common.member")}${activeSiteName ? ` · ${activeSiteName}` : ""}.`}
         actions={
           <Button render={<Link href="/membres/nouveau" />} nativeButton={false}>
             <PlusIcon className="h-4 w-4" />
-            Nouveau membre
+            {t("membres.newMember")}
           </Button>
         }
       />

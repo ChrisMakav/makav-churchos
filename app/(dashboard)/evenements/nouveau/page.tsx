@@ -11,13 +11,14 @@ export default async function NouvelEvenementPage() {
   const supabase = await createClient();
   const organizationId = session.activeOrg.organizationId;
 
-  const [{ data: eventTypes }, { data: departments }] = await Promise.all([
+  const [{ data: eventTypes }, { data: departments }, { data: rooms }] = await Promise.all([
     supabase
       .from("event_types")
       .select("id, label_fr")
       .eq("organization_id", organizationId)
       .order("label_fr"),
     supabase.from("departments").select("id, name").eq("organization_id", organizationId).order("name"),
+    supabase.from("rooms").select("id, name").eq("organization_id", organizationId).order("name"),
   ]);
 
   return (
@@ -27,6 +28,7 @@ export default async function NouvelEvenementPage() {
         action={createEvent.bind(null, organizationId)}
         eventTypes={(eventTypes ?? []).map((t) => ({ id: t.id, label: t.label_fr }))}
         departments={departments ?? []}
+        rooms={rooms ?? []}
         submitLabel="Créer l'événement"
       />
     </div>

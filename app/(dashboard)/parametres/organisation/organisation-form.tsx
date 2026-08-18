@@ -51,7 +51,7 @@ export function OrganisationForm({
       </div>
       <div className="space-y-2">
         <Label htmlFor="currency">Devise</Label>
-        <Select name="currency" defaultValue={currency} items={CURRENCY_OPTIONS}>
+        <Select key={currency} name="currency" defaultValue={currency} items={CURRENCY_OPTIONS}>
           <SelectTrigger id="currency" className="w-full">
             <SelectValue />
           </SelectTrigger>

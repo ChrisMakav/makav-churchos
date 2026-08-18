@@ -5,6 +5,7 @@ import type { Permission } from "@/lib/rbac/permissions";
 import type { OrgContextValue } from "@/lib/rbac/context";
 
 export const ACTIVE_ORG_COOKIE = "active_organization_id";
+export const ACTIVE_SITE_COOKIE = "active_site_id";
 
 export interface CurrentUser {
   id: string;
@@ -19,10 +20,18 @@ export interface OrgOptionData {
   initials: string;
 }
 
+export interface SiteOptionData {
+  id: string;
+  name: string;
+  subtitle: string;
+}
+
 export interface SessionData {
   user: CurrentUser;
   activeOrg: OrgContextValue;
   orgOptions: OrgOptionData[];
+  siteOptions: SiteOptionData[];
+  isSuperAdmin: boolean;
 }
 
 function initialsFrom(name: string) {
@@ -60,6 +69,23 @@ export async function getSession(): Promise<SessionData | null> {
   const active =
     memberships.find((m) => m.organization_id === preferredOrgId) ?? memberships[0]!;
 
+  const [{ data: sites }, { data: memberCounts }] = await Promise.all([
+    supabase.from("sites").select("id, name").eq("organization_id", active.organization_id).order("created_at"),
+    supabase.from("members").select("site_id").eq("organization_id", active.organization_id),
+  ]);
+
+  const countBySite = new Map<string, number>();
+  for (const row of memberCounts ?? []) {
+    countBySite.set(row.site_id, (countBySite.get(row.site_id) ?? 0) + 1);
+  }
+
+  const preferredSiteId = cookieStore.get(ACTIVE_SITE_COOKIE)?.value;
+  const activeSiteId =
+    (sites ?? []).find((s) => s.id === preferredSiteId)?.id ??
+    (sites ?? []).find((s) => s.id === active.site_id)?.id ??
+    sites?.[0]?.id ??
+    null;
+
   const { data: permissionRows } = await supabase
     .from("role_permissions")
     .select("permissions(code)")
@@ -82,7 +108,7 @@ export async function getSession(): Promise<SessionData | null> {
     activeOrg: {
       organizationId: active.organization_id,
       organizationName: active.organizations?.name ?? "Organisation",
-      siteId: active.site_id,
+      siteId: activeSiteId,
       roleCode: active.roles?.code ?? "member",
       roleLabel: active.roles?.label_fr ?? "Membre",
       permissions,
@@ -93,5 +119,14 @@ export async function getSession(): Promise<SessionData | null> {
       subtitle: m.roles?.label_fr ?? "Membre",
       initials: initialsFrom(m.organizations?.name ?? "OR"),
     })),
+    siteOptions: (sites ?? []).map((s) => ({
+      id: s.id,
+      name: s.name,
+      subtitle: `${countBySite.get(s.id) ?? 0} membre${(countBySite.get(s.id) ?? 0) > 1 ? "s" : ""}`,
+    })),
+    // Réutilise la même requête memberships (déjà .eq("status","active")) —
+    // un super_admin peut l'être via n'importe laquelle de ses organisations,
+    // le rôle n'est pas scopé à l'organisation active. Voir 0021_backoffice.sql.
+    isSuperAdmin: memberships.some((m) => m.roles?.code === "super_admin"),
   };
 }

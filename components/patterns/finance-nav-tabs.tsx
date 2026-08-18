@@ -5,18 +5,22 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const TABS = [
+  { label: "Vue d'ensemble", href: "/finances", exact: true },
+  { label: "Dons", href: "/dons" },
   { label: "Comptes", href: "/finances/comptes" },
   { label: "Transactions", href: "/finances/transactions" },
   { label: "Dépenses", href: "/finances/depenses" },
 ];
 
-export function FinanceTabs() {
+export function FinanceNavTabs() {
   const pathname = usePathname();
 
   return (
     <nav className="flex gap-1 border-b border-border">
       {TABS.map((tab) => {
-        const isActive = pathname === tab.href || pathname?.startsWith(`${tab.href}/`);
+        const isActive = tab.exact
+          ? pathname === tab.href
+          : pathname === tab.href || pathname?.startsWith(`${tab.href}/`);
         return (
           <Link
             key={tab.href}

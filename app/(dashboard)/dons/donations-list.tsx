@@ -12,6 +12,7 @@ export interface DonationRow {
   currency: string;
   givenAt: string;
   receiptNumber: string | null;
+  isRecurring: boolean;
 }
 
 const dateFormatter = new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
@@ -22,7 +23,14 @@ const columns: DataTableColumn<DonationRow>[] = [
     header: "Donateur",
     cell: (row) => (
       <div>
-        <p className="font-medium text-foreground">{row.donorName}</p>
+        <p className="font-medium text-foreground">
+          {row.donorName}
+          {row.isRecurring ? (
+            <Badge variant="secondary" className="ml-2">
+              Récurrent
+            </Badge>
+          ) : null}
+        </p>
         <p className="text-xs text-muted-foreground">{row.fundName}</p>
       </div>
     ),

@@ -2,11 +2,19 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/lib/supabase/types";
 
-const PUBLIC_PATHS = ["/", "/connexion", "/inscription"];
+const PUBLIC_PATHS = ["/", "/connexion", "/inscription", "/mon-espace/connexion", "/mon-espace/inscription"];
 
 function isPublicPath(pathname: string) {
   if (PUBLIC_PATHS.includes(pathname)) return true;
   return pathname.startsWith("/inscription/");
+}
+
+// Portail membre : shell séparé du dashboard staff, jamais soumis à la
+// vérification d'onboarding staff (un membre n'a — et n'a pas besoin —
+// d'aucune membership active), et dont le renvoi "non connecté" doit pointer
+// vers /mon-espace/connexion plutôt que /connexion (staff).
+function isMemberPortalPath(pathname: string) {
+  return pathname === "/mon-espace" || pathname.startsWith("/mon-espace/");
 }
 
 // Rafraîchit la session Supabase à chaque requête et applique la garde
@@ -50,9 +58,23 @@ export async function updateSession(request: NextRequest) {
 
   if (!user && !isPublicPath(pathname)) {
     const url = request.nextUrl.clone();
-    url.pathname = "/connexion";
+    url.pathname = isMemberPortalPath(pathname) ? "/mon-espace/connexion" : "/connexion";
     url.searchParams.set("next", pathname);
     return NextResponse.redirect(url);
+  }
+
+  // Backoffice plateforme : réservé aux super_admin (voir
+  // lib/backoffice/guard.ts pour la même vérification côté page/action —
+  // défense en profondeur, la policy RLS is_super_admin() reste la
+  // frontière de sécurité réelle).
+  if (user && pathname.startsWith("/backoffice")) {
+    const { data: isSuperAdmin } = await supabase.rpc("is_super_admin");
+    if (!isSuperAdmin) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/tableau-de-bord";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
   }
 
   if (user && (pathname === "/connexion" || pathname === "/inscription")) {
@@ -62,8 +84,15 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  if (user && (pathname === "/mon-espace/connexion" || pathname === "/mon-espace/inscription")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/mon-espace";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   const needsOnboardingCheck =
-    user && !isPublicPath(pathname) && pathname !== "/inscription/organisation";
+    user && !isPublicPath(pathname) && !isMemberPortalPath(pathname) && pathname !== "/inscription/organisation";
 
   if (needsOnboardingCheck) {
     const { count } = await supabase

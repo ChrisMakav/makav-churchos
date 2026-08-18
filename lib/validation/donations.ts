@@ -1,6 +1,13 @@
 import { z } from "zod";
 
-export const DONATION_METHODS = ["cash", "check", "transfer", "card", "mobile_money"] as const;
+export const DONATION_METHODS = [
+  "cash",
+  "check",
+  "transfer",
+  "card",
+  "mobile_money",
+  "direct_debit",
+] as const;
 
 export const DONATION_METHOD_OPTIONS = [
   { value: "cash", label: "Espèces" },
@@ -8,6 +15,7 @@ export const DONATION_METHOD_OPTIONS = [
   { value: "transfer", label: "Virement" },
   { value: "card", label: "Carte bancaire" },
   { value: "mobile_money", label: "Mobile money" },
+  { value: "direct_debit", label: "Prélèvement" },
 ] as const;
 
 const amountSchema = z
@@ -27,4 +35,26 @@ export const donationFormSchema = z.object({
   method: z.enum(DONATION_METHODS),
   givenAt: z.string().min(1, "La date est requise"),
   isAnonymous: z.boolean().default(false),
+  isRecurring: z.boolean().default(false),
+});
+
+const goalAmountSchema = z
+  .string()
+  .optional()
+  .transform((v) => (v ? Number(v) : null))
+  .refine((v) => v === null || v > 0, "L'objectif doit être positif");
+
+export const donationFundFormSchema = z.object({
+  name: z.string().trim().min(1, "Le nom est requis").max(150),
+  isRestricted: z.boolean().default(false),
+  isActive: z.boolean().default(true),
+  goalAmount: goalAmountSchema,
+  startsOn: z
+    .string()
+    .optional()
+    .transform((v) => (v ? v : null)),
+  endsOn: z
+    .string()
+    .optional()
+    .transform((v) => (v ? v : null)),
 });

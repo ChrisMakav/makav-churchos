@@ -3,40 +3,56 @@ import {
   Users,
   HeartHandshake,
   Building2,
+  CircleUserRound,
+  HeartPulse,
+  BadgeCheck,
   CalendarDays,
   Wallet,
-  HandCoins,
   PiggyBank,
   Settings,
+  BarChart3,
+  CalendarClock,
+  MessageSquare,
+  ClipboardList,
+  Car,
 } from "lucide-react";
 import type { NavSection } from "@/components/nav/sidebar";
 
 export const NAV_SECTIONS: NavSection[] = [
   {
-    label: "Pilotage",
-    items: [{ label: "Tableau de bord", href: "/tableau-de-bord", icon: Home }],
-  },
-  {
-    label: "Communauté",
+    labelKey: "nav.pilotage",
     items: [
-      { label: "Membres", href: "/membres", icon: Users },
-      { label: "Familles", href: "/familles", icon: HeartHandshake },
-      { label: "Départements", href: "/departements", icon: Building2 },
+      { labelKey: "nav.tableauDeBord", href: "/tableau-de-bord", icon: Home },
+      { labelKey: "nav.rapports", href: "/rapports", icon: BarChart3 },
     ],
   },
   {
-    label: "Opérations",
+    labelKey: "nav.communaute",
     items: [
-      { label: "Événements", href: "/evenements", icon: CalendarDays },
-      { label: "Finances", href: "/finances", icon: Wallet },
-      { label: "Dons", href: "/dons", icon: HandCoins },
-      { label: "Budgets", href: "/budgets", icon: PiggyBank },
+      { labelKey: "nav.membres", href: "/membres", icon: Users },
+      { labelKey: "nav.familles", href: "/familles", icon: HeartHandshake },
+      { labelKey: "nav.departements", href: "/departements", icon: Building2 },
+      { labelKey: "nav.groupes", href: "/groupes", icon: CircleUserRound },
+      { labelKey: "nav.suiviPastoral", href: "/suivi-pastoral", icon: HeartPulse },
+      { labelKey: "nav.checkin", href: "/checkin", icon: BadgeCheck },
+    ],
+  },
+  {
+    labelKey: "nav.operations",
+    items: [
+      { labelKey: "nav.evenements", href: "/evenements", icon: CalendarDays },
+      { labelKey: "nav.statistiques", href: "/statistiques", icon: ClipboardList },
+      { labelKey: "nav.benevoles", href: "/benevoles", icon: CalendarClock },
+      { labelKey: "nav.covoiturage", href: "/covoiturage", icon: Car },
+      { labelKey: "nav.communication", href: "/communication", icon: MessageSquare },
+      { labelKey: "nav.finances", href: "/finances", icon: Wallet },
+      { labelKey: "nav.budgets", href: "/budgets", icon: PiggyBank },
     ],
   },
 ];
 
 export const SETTINGS_NAV_ITEM = {
-  label: "Paramètres",
+  labelKey: "nav.parametres" as const,
   href: "/parametres/organisation",
   icon: Settings,
 };

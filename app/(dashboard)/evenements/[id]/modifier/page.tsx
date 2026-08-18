@@ -16,17 +16,18 @@ export default async function ModifierEvenementPage({
   const supabase = await createClient();
   const organizationId = session.activeOrg.organizationId;
 
-  const [{ data: event }, { data: eventTypes }, { data: departments }] = await Promise.all([
+  const [{ data: event }, { data: eventTypes }, { data: departments }, { data: rooms }] = await Promise.all([
     supabase
       .from("events")
       .select(
-        "id, title, description, location, starts_at, ends_at, capacity, event_type_id, department_id",
+        "id, title, description, location, room_id, starts_at, ends_at, capacity, event_type_id, department_id",
       )
       .eq("id", id)
       .eq("organization_id", organizationId)
       .maybeSingle(),
     supabase.from("event_types").select("id, label_fr").eq("organization_id", organizationId).order("label_fr"),
     supabase.from("departments").select("id, name").eq("organization_id", organizationId).order("name"),
+    supabase.from("rooms").select("id, name").eq("organization_id", organizationId).order("name"),
   ]);
 
   if (!event) notFound();
@@ -38,12 +39,14 @@ export default async function ModifierEvenementPage({
         action={updateEvent.bind(null, organizationId, event.id)}
         eventTypes={(eventTypes ?? []).map((t) => ({ id: t.id, label: t.label_fr }))}
         departments={departments ?? []}
+        rooms={rooms ?? []}
         submitLabel="Enregistrer"
         initialValues={{
           title: event.title,
           eventTypeId: event.event_type_id,
           description: event.description ?? "",
           location: event.location ?? "",
+          roomId: event.room_id ?? "",
           startsAt: toDatetimeLocalValue(event.starts_at),
           endsAt: toDatetimeLocalValue(event.ends_at),
           departmentId: event.department_id ?? "",

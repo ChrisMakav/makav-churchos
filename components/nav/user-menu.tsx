@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LogOut, Settings } from "lucide-react";
+import { LogOut, Settings, ShieldIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -23,9 +23,16 @@ export interface CurrentUser {
 interface UserMenuProps {
   user: CurrentUser;
   onSignOut?: () => void;
+  labels?: { settings: string; signOut: string };
+  isSuperAdmin?: boolean;
 }
 
-export function UserMenu({ user, onSignOut }: UserMenuProps) {
+export function UserMenu({
+  user,
+  onSignOut,
+  labels = { settings: "Paramètres", signOut: "Se déconnecter" },
+  isSuperAdmin = false,
+}: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -50,12 +57,18 @@ export function UserMenu({ user, onSignOut }: UserMenuProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem render={<Link href="/parametres/organisation" />}>
           <Settings className="h-4 w-4" />
-          Paramètres
+          {labels.settings}
         </DropdownMenuItem>
+        {isSuperAdmin ? (
+          <DropdownMenuItem render={<Link href="/backoffice" />}>
+            <ShieldIcon className="h-4 w-4" />
+            Backoffice
+          </DropdownMenuItem>
+        ) : null}
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={onSignOut}>
           <LogOut className="h-4 w-4" />
-          Se déconnecter
+          {labels.signOut}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

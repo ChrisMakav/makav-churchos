@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { DataTable, type DataTableColumn } from "@/components/patterns/data-table";
 import { Badge } from "@/components/ui/badge";
 import { MEMBER_STATUS_OPTIONS } from "@/lib/validation/members";
+import { useTranslations } from "@/lib/i18n/context";
 
 export interface MemberRow {
   id: string;
@@ -26,35 +27,36 @@ const STATUS_VARIANT: Record<string, "default" | "secondary" | "outline" | "dest
   deceased: "destructive",
 };
 
-const columns: DataTableColumn<MemberRow>[] = [
-  {
-    id: "name",
-    header: "Membre",
-    cell: (row) => (
-      <div>
-        <p className="font-medium text-foreground">{row.fullName}</p>
-        <p className="text-xs text-muted-foreground">{row.email ?? row.phone ?? "—"}</p>
-      </div>
-    ),
-  },
-  {
-    id: "family",
-    header: "Famille",
-    cell: (row) => row.familyName ?? "—",
-  },
-  {
-    id: "status",
-    header: "Statut",
-    cell: (row) => (
-      <Badge variant={STATUS_VARIANT[row.status] ?? "outline"}>
-        {STATUS_LABEL[row.status] ?? row.status}
-      </Badge>
-    ),
-  },
-];
-
 export function MembersList({ rows }: { rows: MemberRow[] }) {
   const router = useRouter();
+  const { t } = useTranslations();
+
+  const columns: DataTableColumn<MemberRow>[] = [
+    {
+      id: "name",
+      header: t("membres.columnMember"),
+      cell: (row) => (
+        <div>
+          <p className="font-medium text-foreground">{row.fullName}</p>
+          <p className="text-xs text-muted-foreground">{row.email ?? row.phone ?? "—"}</p>
+        </div>
+      ),
+    },
+    {
+      id: "family",
+      header: t("membres.columnFamily"),
+      cell: (row) => row.familyName ?? "—",
+    },
+    {
+      id: "status",
+      header: t("membres.columnStatus"),
+      cell: (row) => (
+        <Badge variant={STATUS_VARIANT[row.status] ?? "outline"}>
+          {STATUS_LABEL[row.status] ?? row.status}
+        </Badge>
+      ),
+    },
+  ];
 
   return (
     <DataTable
@@ -67,9 +69,9 @@ export function MembersList({ rows }: { rows: MemberRow[] }) {
         (row.email?.toLowerCase().includes(query) ?? false) ||
         (row.phone?.toLowerCase().includes(query) ?? false)
       }
-      searchPlaceholder="Rechercher un membre…"
-      emptyTitle="Aucun membre"
-      emptyDescription="Ajoutez votre premier membre pour commencer."
+      searchPlaceholder={t("membres.searchPlaceholder")}
+      emptyTitle={t("membres.emptyTitle")}
+      emptyDescription={t("membres.emptyDescription")}
     />
   );
 }

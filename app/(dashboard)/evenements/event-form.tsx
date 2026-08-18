@@ -25,11 +25,17 @@ export interface DepartmentOption {
   name: string;
 }
 
+export interface RoomOption {
+  id: string;
+  name: string;
+}
+
 export interface EventFormInitialValues {
   title: string;
   eventTypeId: string;
   description: string;
   location: string;
+  roomId: string;
   startsAt: string;
   endsAt: string;
   departmentId: string;
@@ -41,6 +47,7 @@ const EMPTY_VALUES: EventFormInitialValues = {
   eventTypeId: "",
   description: "",
   location: "",
+  roomId: "",
   startsAt: "",
   endsAt: "",
   departmentId: "",
@@ -48,17 +55,20 @@ const EMPTY_VALUES: EventFormInitialValues = {
 };
 
 const NO_DEPARTMENT = "__none__";
+const NO_ROOM = "__none__";
 
 export function EventForm({
   action,
   eventTypes,
   departments,
+  rooms,
   initialValues = EMPTY_VALUES,
   submitLabel,
 }: {
   action: (state: EventFormState, formData: FormData) => Promise<EventFormState>;
   eventTypes: EventTypeOption[];
   departments: DepartmentOption[];
+  rooms: RoomOption[];
   initialValues?: EventFormInitialValues;
   submitLabel: string;
 }) {
@@ -68,6 +78,10 @@ export function EventForm({
   const departmentItems = [
     { value: NO_DEPARTMENT, label: "Aucun" },
     ...departments.map((d) => ({ value: d.id, label: d.name })),
+  ];
+  const roomItems = [
+    { value: NO_ROOM, label: "Aucune salle" },
+    ...rooms.map((r) => ({ value: r.id, label: r.name })),
   ];
 
   return (
@@ -155,7 +169,26 @@ export function EventForm({
           ) : null}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="location">Lieu</Label>
+          <Label htmlFor="roomId">Salle</Label>
+          <Select
+            name="roomId"
+            defaultValue={initialValues.roomId || NO_ROOM}
+            items={roomItems}
+          >
+            <SelectTrigger id="roomId" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {roomItems.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="location">Lieu (si hors salle)</Label>
           <Input id="location" name="location" defaultValue={initialValues.location} />
         </div>
         <div className="space-y-2">

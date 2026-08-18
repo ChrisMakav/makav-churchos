@@ -3,8 +3,9 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { requirePermission } from "@/lib/rbac/guard";
 import { getDefaultSiteId } from "@/lib/sites";
-import { donationFormSchema } from "@/lib/validation/donations";
+import { donationFormSchema, donationFundFormSchema } from "@/lib/validation/donations";
 
 export interface DonationFormState {
   error?: string;
@@ -28,6 +29,7 @@ export async function createDonation(
     method: String(formData.get("method") ?? "cash"),
     givenAt: String(formData.get("givenAt") ?? ""),
     isAnonymous: formData.get("isAnonymous") === "on",
+    isRecurring: formData.get("isRecurring") === "on",
   });
 
   if (!result.success) {
@@ -56,6 +58,7 @@ export async function createDonation(
     target_method: result.data.method,
     target_given_at: result.data.givenAt,
     target_is_anonymous: result.data.isAnonymous,
+    target_is_recurring: result.data.isRecurring,
   });
 
   if (error) {
@@ -64,6 +67,98 @@ export async function createDonation(
   }
 
   revalidatePath("/dons");
+  revalidatePath("/finances");
   revalidatePath("/finances/transactions");
   redirect(`/dons/${data}`);
+}
+
+// --- Fonds / projets --------------------------------------------------------
+
+function parseDonationFundForm(formData: FormData) {
+  const result = donationFundFormSchema.safeParse({
+    name: String(formData.get("name") ?? ""),
+    isRestricted: formData.get("isRestricted") === "on",
+    isActive: formData.get("isActive") === "on",
+    goalAmount: String(formData.get("goalAmount") ?? ""),
+    startsOn: String(formData.get("startsOn") ?? ""),
+    endsOn: String(formData.get("endsOn") ?? ""),
+  });
+  if (!result.success) {
+    throw new Error(result.error.issues[0]?.message ?? "Fonds invalide.");
+  }
+  return result.data;
+}
+
+export async function createDonationFund(organizationId: string, formData: FormData) {
+  await requirePermission(organizationId, "donations.write");
+  const data = parseDonationFundForm(formData);
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("donation_funds").insert({
+    organization_id: organizationId,
+    name: data.name,
+    is_restricted: data.isRestricted,
+    is_active: data.isActive,
+    goal_amount: data.goalAmount,
+    starts_on: data.startsOn,
+    ends_on: data.endsOn,
+  });
+  if (error) throw error;
+  revalidatePath("/finances");
+  revalidatePath("/dons/projets");
+  revalidatePath("/dons/nouveau");
+}
+
+export async function updateDonationFund(
+  organizationId: string,
+  fundId: string,
+  formData: FormData,
+) {
+  await requirePermission(organizationId, "donations.write");
+  const data = parseDonationFundForm(formData);
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("donation_funds")
+    .update({
+      name: data.name,
+      is_restricted: data.isRestricted,
+      is_active: data.isActive,
+      goal_amount: data.goalAmount,
+      starts_on: data.startsOn,
+      ends_on: data.endsOn,
+    })
+    .eq("id", fundId)
+    .eq("organization_id", organizationId);
+  if (error) throw error;
+  revalidatePath("/finances");
+  revalidatePath("/dons/projets");
+}
+
+export async function deleteDonationFund(organizationId: string, fundId: string) {
+  await requirePermission(organizationId, "donations.write");
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("donation_funds")
+    .delete()
+    .eq("id", fundId)
+    .eq("organization_id", organizationId);
+  if (error) throw error;
+  revalidatePath("/finances");
+  revalidatePath("/dons/projets");
+}
+
+// --- Reçus fiscaux annuels ---------------------------------------------------
+
+export async function generateAnnualReceipts(organizationId: string, year: number) {
+  await requirePermission(organizationId, "donations.write");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("generate_annual_receipts", {
+    target_org_id: organizationId,
+    target_year: year,
+  });
+  if (error) throw error;
+  revalidatePath("/finances");
+  revalidatePath("/dons/recus-annuels");
+  redirect("/dons/recus-annuels");
 }

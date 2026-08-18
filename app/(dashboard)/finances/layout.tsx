@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
-import { FinanceTabs } from "./finance-tabs";
+import { FinanceNavTabs } from "@/components/patterns/finance-nav-tabs";
 
 export default function FinancesLayout({ children }: { children: ReactNode }) {
   return (
     <div className="space-y-6">
-      <FinanceTabs />
+      <FinanceNavTabs />
       {children}
     </div>
   );

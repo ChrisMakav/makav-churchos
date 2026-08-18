@@ -2,6 +2,7 @@
 
 import { DataTable, type DataTableColumn } from "@/components/patterns/data-table";
 import { Badge } from "@/components/ui/badge";
+import { ReconcileToggle } from "./reconcile-toggle";
 
 export interface TransactionRow {
   id: string;
@@ -12,6 +13,7 @@ export interface TransactionRow {
   type: string;
   amount: number;
   currency: string;
+  isReconciled: boolean;
 }
 
 const dateFormatter = new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
@@ -56,10 +58,31 @@ const columns: DataTableColumn<TransactionRow>[] = [
   },
 ];
 
-export function TransactionsList({ rows }: { rows: TransactionRow[] }) {
+export function TransactionsList({
+  organizationId,
+  rows,
+}: {
+  organizationId: string;
+  rows: TransactionRow[];
+}) {
+  const columnsWithReconcile: DataTableColumn<TransactionRow>[] = [
+    ...columns,
+    {
+      id: "reconciled",
+      header: "",
+      cell: (row) => (
+        <ReconcileToggle
+          organizationId={organizationId}
+          transactionId={row.id}
+          reconciled={row.isReconciled}
+        />
+      ),
+    },
+  ];
+
   return (
     <DataTable
-      columns={columns}
+      columns={columnsWithReconcile}
       data={rows}
       getRowId={(row) => row.id}
       searchable={(row, query) =>

@@ -27,7 +27,7 @@ export default async function MemberDetailPage({
   const { data: member } = await supabase
     .from("members")
     .select(
-      "id, first_name, last_name, email, phone, birth_date, gender, member_status, join_date, photo_url, family_role, families!members_family_id_fkey(name)",
+      "id, first_name, last_name, email, phone, birth_date, gender, member_status, join_date, photo_url, family_role, user_id, families!members_family_id_fkey(name)",
     )
     .eq("id", id)
     .eq("organization_id", session.activeOrg.organizationId)
@@ -49,6 +49,7 @@ export default async function MemberDetailPage({
           genderLabel: labelFor(GENDER_OPTIONS, member.gender),
           familyName: member.families?.name ?? null,
           familyRoleLabel: labelFor(FAMILY_ROLE_OPTIONS, member.family_role),
+          portalActive: Boolean(member.user_id),
         }}
         actions={
           <Button

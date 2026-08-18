@@ -9,21 +9,23 @@ Deux frontières, délibérément :
 
 ## Catalogue des rôles
 
-11 rôles système seedés (`organization_id is null`, `is_system = true`), 6 câblés dans l'onboarding/invitation P1 :
+11 rôles système seedés (`organization_id is null`, `is_system = true`), 7 câblés dans l'onboarding/invitation UI :
 
-| Code | Label | Couvre (brief) | Câblé en UI P1 |
+| Code | Label | Couvre (brief) | Câblé en UI |
 |---|---|---|---|
 | `super_admin` | Super administrateur | Super Admin | non |
 | `org_admin` | Administrateur d'église | Church Admin, Admin Manager | **oui** |
 | `pastor` | Pasteur (principal / adjoint) | Senior/Associate Pastor | **oui** |
 | `finance_manager` | Responsable financier / Trésorier | Finance Manager, Treasurer | **oui** |
 | `dept_head` | Responsable de département / groupe / événement | Dept Head, Group Leader, Event Manager | **oui** |
+| `volunteer_manager` | Responsable RH / bénévoles | HR/Volunteer Manager | **oui** (depuis `0018`, module Bénévoles) |
+| `communications_manager` | Responsable communication | Communications Manager | **oui** (depuis `0019`, module Communication) |
 | `member` | Membre | Member | **oui** |
 | `visitor` | Visiteur | Visitor | non |
-| `volunteer_manager` | Responsable RH / bénévoles | HR/Volunteer Manager | non |
-| `communications_manager` | Responsable communication | Communications Manager | non |
-| `technical_manager` | Responsable technique | Technical Manager | non |
-| `hr_manager` | Responsable administratif | Admin Manager (RH) | non |
+| `technical_manager` | Responsable technique | Technical Manager | non — aucune permission câblée, aucun module dédié à ce jour |
+| `hr_manager` | Responsable administratif | Admin Manager (RH) | non — aucune permission câblée, aucun module dédié à ce jour |
+
+**Règle** : un rôle avec des permissions câblées (`role_permissions`) mais absent de `P1_ROLE_OPTIONS` (`app/(dashboard)/parametres/utilisateurs/roles.ts`) est inatteignable depuis l'UI — aucun `org_admin` ne peut l'assigner. Toujours ajouter le rôle à cette liste dans la même migration qui lui attribue des permissions (leçon tirée après coup pour `volunteer_manager`/`communications_manager`, corrigé le 2026-08-12).
 
 Ajouter un rôle au sélecteur d'invitation P1 = ajouter son `code` à `P1_ROLE_OPTIONS` (`app/(dashboard)/parametres/utilisateurs/roles.ts`) — pas de migration nécessaire, le rôle existe déjà en base.
 

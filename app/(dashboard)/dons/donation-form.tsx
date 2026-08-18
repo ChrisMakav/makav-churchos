@@ -49,6 +49,7 @@ export function DonationForm({
     {} as DonationFormState,
   );
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [isRecurring, setIsRecurring] = useState(false);
 
   const accountItems = accounts.map((a) => ({ value: a.id, label: a.name }));
   const fundItems = funds.map((f) => ({ value: f.id, label: f.name }));
@@ -90,6 +91,18 @@ export function DonationForm({
         />
         <Label htmlFor="isAnonymous" className="font-normal">
           Ne pas afficher le nom du donateur (don anonyme)
+        </Label>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Checkbox
+          id="isRecurring"
+          name="isRecurring"
+          checked={isRecurring}
+          onCheckedChange={(checked) => setIsRecurring(checked === true)}
+        />
+        <Label htmlFor="isRecurring" className="font-normal">
+          Ce don fait partie d&apos;un engagement de don récurrent
         </Label>
       </div>
 

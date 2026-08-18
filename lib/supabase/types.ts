@@ -7,6 +7,31 @@ export type Json =
   | Json[]
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       accounts: {
@@ -53,6 +78,136 @@ export type Database = {
           },
           {
             foreignKeyName: "accounts_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      annual_donation_receipts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          donation_count: number
+          fiscal_year: number
+          id: string
+          issued_at: string
+          member_id: string
+          organization_id: string
+          receipt_number: string
+          total_amount: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          donation_count: number
+          fiscal_year: number
+          id?: string
+          issued_at?: string
+          member_id: string
+          organization_id: string
+          receipt_number: string
+          total_amount: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          donation_count?: number
+          fiscal_year?: number
+          id?: string
+          issued_at?: string
+          member_id?: string
+          organization_id?: string
+          receipt_number?: string
+          total_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "annual_donation_receipts_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "annual_donation_receipts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attendance_records: {
+        Row: {
+          children_count: number
+          created_at: string
+          created_by: string | null
+          event_id: string | null
+          id: string
+          label: string
+          men_count: number
+          new_people_count: number
+          notes: string | null
+          organization_id: string
+          service_date: string
+          site_id: string
+          teens_count: number
+          total_count: number | null
+          women_count: number
+        }
+        Insert: {
+          children_count?: number
+          created_at?: string
+          created_by?: string | null
+          event_id?: string | null
+          id?: string
+          label: string
+          men_count?: number
+          new_people_count?: number
+          notes?: string | null
+          organization_id: string
+          service_date: string
+          site_id: string
+          teens_count?: number
+          total_count?: number | null
+          women_count?: number
+        }
+        Update: {
+          children_count?: number
+          created_at?: string
+          created_by?: string | null
+          event_id?: string | null
+          id?: string
+          label?: string
+          men_count?: number
+          new_people_count?: number
+          notes?: string | null
+          organization_id?: string
+          service_date?: string
+          site_id?: string
+          teens_count?: number
+          total_count?: number | null
+          women_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_records_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_records_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_records_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "sites"
@@ -184,6 +339,552 @@ export type Database = {
           },
         ]
       }
+      carpool_driver_availabilities: {
+        Row: {
+          created_at: string
+          frequency: string | null
+          id: string
+          is_active: boolean
+          member_id: string
+          notes: string | null
+          organization_id: string
+          vehicle_id: string | null
+          zones: string | null
+        }
+        Insert: {
+          created_at?: string
+          frequency?: string | null
+          id?: string
+          is_active?: boolean
+          member_id: string
+          notes?: string | null
+          organization_id: string
+          vehicle_id?: string | null
+          zones?: string | null
+        }
+        Update: {
+          created_at?: string
+          frequency?: string | null
+          id?: string
+          is_active?: boolean
+          member_id?: string
+          notes?: string | null
+          organization_id?: string
+          vehicle_id?: string | null
+          zones?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carpool_driver_availabilities_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_driver_availabilities_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_driver_availabilities_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "carpool_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carpool_incidents: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          incident_type: string
+          organization_id: string
+          reported_by_member_id: string
+          resolved_at: string | null
+          resolved_by: string | null
+          ride_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          incident_type: string
+          organization_id: string
+          reported_by_member_id: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          ride_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          incident_type?: string
+          organization_id?: string
+          reported_by_member_id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          ride_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carpool_incidents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_incidents_reported_by_member_id_fkey"
+            columns: ["reported_by_member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_incidents_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "carpool_rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carpool_ride_needs: {
+        Row: {
+          created_at: string
+          departure_label: string
+          event_id: string | null
+          has_children: boolean
+          id: string
+          member_id: string
+          needed_by: string | null
+          notes: string | null
+          organization_id: string
+          seats_needed: number
+          site_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          departure_label: string
+          event_id?: string | null
+          has_children?: boolean
+          id?: string
+          member_id: string
+          needed_by?: string | null
+          notes?: string | null
+          organization_id: string
+          seats_needed?: number
+          site_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          departure_label?: string
+          event_id?: string | null
+          has_children?: boolean
+          id?: string
+          member_id?: string
+          needed_by?: string | null
+          notes?: string | null
+          organization_id?: string
+          seats_needed?: number
+          site_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carpool_ride_needs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_ride_needs_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_ride_needs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_ride_needs_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carpool_ride_requests: {
+        Row: {
+          checked_in_at: string | null
+          created_at: string
+          decided_at: string | null
+          id: string
+          message: string | null
+          no_show: boolean
+          organization_id: string
+          passenger_member_id: string
+          requested_at: string
+          ride_id: string
+          seats_requested: number
+          status: string
+        }
+        Insert: {
+          checked_in_at?: string | null
+          created_at?: string
+          decided_at?: string | null
+          id?: string
+          message?: string | null
+          no_show?: boolean
+          organization_id: string
+          passenger_member_id: string
+          requested_at?: string
+          ride_id: string
+          seats_requested?: number
+          status?: string
+        }
+        Update: {
+          checked_in_at?: string | null
+          created_at?: string
+          decided_at?: string | null
+          id?: string
+          message?: string | null
+          no_show?: boolean
+          organization_id?: string
+          passenger_member_id?: string
+          requested_at?: string
+          ride_id?: string
+          seats_requested?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carpool_ride_requests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_ride_requests_passenger_member_id_fkey"
+            columns: ["passenger_member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_ride_requests_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "carpool_rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carpool_ride_stops: {
+        Row: {
+          address: string | null
+          created_at: string
+          estimated_time: string | null
+          id: string
+          label: string
+          position_order: number
+          ride_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          estimated_time?: string | null
+          id?: string
+          label: string
+          position_order?: number
+          ride_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          estimated_time?: string | null
+          id?: string
+          label?: string
+          position_order?: number
+          ride_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carpool_ride_stops_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "carpool_rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carpool_rides: {
+        Row: {
+          accepts_children: boolean
+          accepts_luggage: boolean
+          accepts_pets: boolean
+          auto_confirm: boolean
+          created_at: string
+          created_by: string | null
+          departs_at: string
+          departure_label: string
+          destination_label: string
+          driver_member_id: string
+          estimated_arrival_at: string | null
+          event_id: string | null
+          has_air_conditioning: boolean
+          id: string
+          is_pmr_accessible: boolean
+          non_smoking: boolean
+          notes: string | null
+          organization_id: string
+          recurrence_group_id: string | null
+          seat_capacity: number
+          seats_available: number
+          site_id: string
+          status: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          accepts_children?: boolean
+          accepts_luggage?: boolean
+          accepts_pets?: boolean
+          auto_confirm?: boolean
+          created_at?: string
+          created_by?: string | null
+          departs_at: string
+          departure_label: string
+          destination_label: string
+          driver_member_id: string
+          estimated_arrival_at?: string | null
+          event_id?: string | null
+          has_air_conditioning?: boolean
+          id?: string
+          is_pmr_accessible?: boolean
+          non_smoking?: boolean
+          notes?: string | null
+          organization_id: string
+          recurrence_group_id?: string | null
+          seat_capacity: number
+          seats_available: number
+          site_id: string
+          status?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          accepts_children?: boolean
+          accepts_luggage?: boolean
+          accepts_pets?: boolean
+          auto_confirm?: boolean
+          created_at?: string
+          created_by?: string | null
+          departs_at?: string
+          departure_label?: string
+          destination_label?: string
+          driver_member_id?: string
+          estimated_arrival_at?: string | null
+          event_id?: string | null
+          has_air_conditioning?: boolean
+          id?: string
+          is_pmr_accessible?: boolean
+          non_smoking?: boolean
+          notes?: string | null
+          organization_id?: string
+          recurrence_group_id?: string | null
+          seat_capacity?: number
+          seats_available?: number
+          site_id?: string
+          status?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carpool_rides_driver_member_id_fkey"
+            columns: ["driver_member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_rides_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_rides_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_rides_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_rides_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "carpool_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carpool_vehicles: {
+        Row: {
+          brand: string
+          color: string | null
+          created_at: string
+          id: string
+          is_pmr_accessible: boolean
+          member_id: string
+          model: string
+          organization_id: string
+          plate_masked: string | null
+          seat_capacity: number
+        }
+        Insert: {
+          brand: string
+          color?: string | null
+          created_at?: string
+          id?: string
+          is_pmr_accessible?: boolean
+          member_id: string
+          model: string
+          organization_id: string
+          plate_masked?: string | null
+          seat_capacity: number
+        }
+        Update: {
+          brand?: string
+          color?: string | null
+          created_at?: string
+          id?: string
+          is_pmr_accessible?: boolean
+          member_id?: string
+          model?: string
+          organization_id?: string
+          plate_masked?: string | null
+          seat_capacity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carpool_vehicles_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_vehicles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      checkin_sessions: {
+        Row: {
+          checked_in_at: string
+          checked_in_by: string
+          checked_out_at: string | null
+          checked_out_by: string | null
+          child_member_id: string
+          event_id: string | null
+          guardian_name: string
+          guardian_phone: string | null
+          id: string
+          notes: string | null
+          organization_id: string
+          security_code: string
+          site_id: string
+        }
+        Insert: {
+          checked_in_at?: string
+          checked_in_by: string
+          checked_out_at?: string | null
+          checked_out_by?: string | null
+          child_member_id: string
+          event_id?: string | null
+          guardian_name: string
+          guardian_phone?: string | null
+          id?: string
+          notes?: string | null
+          organization_id: string
+          security_code: string
+          site_id: string
+        }
+        Update: {
+          checked_in_at?: string
+          checked_in_by?: string
+          checked_out_at?: string | null
+          checked_out_by?: string | null
+          child_member_id?: string
+          event_id?: string | null
+          guardian_name?: string
+          guardian_phone?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          security_code?: string
+          site_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checkin_sessions_child_member_id_fkey"
+            columns: ["child_member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checkin_sessions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checkin_sessions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checkin_sessions_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       department_members: {
         Row: {
           department_id: string
@@ -282,24 +983,36 @@ export type Database = {
       donation_funds: {
         Row: {
           created_at: string
+          ends_on: string | null
+          goal_amount: number | null
           id: string
+          is_active: boolean
           is_restricted: boolean
           name: string
           organization_id: string
+          starts_on: string | null
         }
         Insert: {
           created_at?: string
+          ends_on?: string | null
+          goal_amount?: number | null
           id?: string
+          is_active?: boolean
           is_restricted?: boolean
           name: string
           organization_id: string
+          starts_on?: string | null
         }
         Update: {
           created_at?: string
+          ends_on?: string | null
+          goal_amount?: number | null
           id?: string
+          is_active?: boolean
           is_restricted?: boolean
           name?: string
           organization_id?: string
+          starts_on?: string | null
         }
         Relationships: [
           {
@@ -321,6 +1034,7 @@ export type Database = {
           given_at: string
           id: string
           is_anonymous: boolean
+          is_recurring: boolean
           member_id: string | null
           method: string
           organization_id: string
@@ -338,6 +1052,7 @@ export type Database = {
           given_at: string
           id?: string
           is_anonymous?: boolean
+          is_recurring?: boolean
           member_id?: string | null
           method: string
           organization_id: string
@@ -355,6 +1070,7 @@ export type Database = {
           given_at?: string
           id?: string
           is_anonymous?: boolean
+          is_recurring?: boolean
           member_id?: string | null
           method?: string
           organization_id?: string
@@ -397,6 +1113,76 @@ export type Database = {
             columns: ["transaction_id"]
             isOneToOne: false
             referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_registration_tracks: {
+        Row: {
+          capacity: number
+          created_at: string
+          event_id: string
+          id: string
+          label: string
+          registered_count: number
+        }
+        Insert: {
+          capacity: number
+          created_at?: string
+          event_id: string
+          id?: string
+          label: string
+          registered_count?: number
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          event_id?: string
+          id?: string
+          label?: string
+          registered_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registration_tracks_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_service_items: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          owner_name: string | null
+          starts_at: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          owner_name?: string | null
+          starts_at: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          owner_name?: string | null
+          starts_at?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_service_items_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
             referencedColumns: ["id"]
           },
         ]
@@ -446,6 +1232,7 @@ export type Database = {
           id: string
           location: string | null
           organization_id: string
+          room_id: string | null
           site_id: string
           starts_at: string
           status: string
@@ -463,6 +1250,7 @@ export type Database = {
           id?: string
           location?: string | null
           organization_id: string
+          room_id?: string | null
           site_id: string
           starts_at: string
           status?: string
@@ -480,6 +1268,7 @@ export type Database = {
           id?: string
           location?: string | null
           organization_id?: string
+          room_id?: string | null
           site_id?: string
           starts_at?: string
           status?: string
@@ -505,6 +1294,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
             referencedColumns: ["id"]
           },
           {
@@ -661,6 +1457,188 @@ export type Database = {
           },
           {
             foreignKeyName: "families_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_members: {
+        Row: {
+          group_id: string
+          joined_at: string
+          member_id: string
+          role_in_group: string
+        }
+        Insert: {
+          group_id: string
+          joined_at?: string
+          member_id: string
+          role_in_group?: string
+        }
+        Update: {
+          group_id?: string
+          joined_at?: string
+          member_id?: string
+          role_in_group?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_members_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_reports: {
+        Row: {
+          children_count: number
+          created_at: string
+          created_by: string | null
+          group_id: string
+          id: string
+          meeting_date: string
+          men_count: number
+          new_births_count: number
+          new_people_count: number
+          notes: string | null
+          organization_id: string
+          site_id: string
+          teens_count: number
+          theme: string
+          total_count: number | null
+          women_count: number
+        }
+        Insert: {
+          children_count?: number
+          created_at?: string
+          created_by?: string | null
+          group_id: string
+          id?: string
+          meeting_date: string
+          men_count?: number
+          new_births_count?: number
+          new_people_count?: number
+          notes?: string | null
+          organization_id: string
+          site_id: string
+          teens_count?: number
+          theme: string
+          total_count?: number | null
+          women_count?: number
+        }
+        Update: {
+          children_count?: number
+          created_at?: string
+          created_by?: string | null
+          group_id?: string
+          id?: string
+          meeting_date?: string
+          men_count?: number
+          new_births_count?: number
+          new_people_count?: number
+          notes?: string | null
+          organization_id?: string
+          site_id?: string
+          teens_count?: number
+          theme?: string
+          total_count?: number | null
+          women_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_reports_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_reports_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_reports_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      groups: {
+        Row: {
+          capacity: number | null
+          created_at: string
+          description: string | null
+          id: string
+          leader_member_id: string | null
+          location: string | null
+          meeting_day: string | null
+          meeting_time: string | null
+          name: string
+          organization_id: string
+          site_id: string
+          status: string
+        }
+        Insert: {
+          capacity?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          leader_member_id?: string | null
+          location?: string | null
+          meeting_day?: string | null
+          meeting_time?: string | null
+          name: string
+          organization_id: string
+          site_id: string
+          status?: string
+        }
+        Update: {
+          capacity?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          leader_member_id?: string | null
+          location?: string | null
+          meeting_day?: string | null
+          meeting_time?: string | null
+          name?: string
+          organization_id?: string
+          site_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "groups_leader_member_id_fkey"
+            columns: ["leader_member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "groups_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "groups_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "sites"
@@ -886,6 +1864,166 @@ export type Database = {
         }
         Relationships: []
       }
+      pastoral_appointment_managers: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          organization_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          organization_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          organization_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pastoral_appointment_managers_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pastoral_appointment_slots: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          id: string
+          location: string | null
+          member_id: string | null
+          organization_id: string
+          pastor_user_id: string
+          reason: string | null
+          site_id: string
+          starts_at: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          id?: string
+          location?: string | null
+          member_id?: string | null
+          organization_id: string
+          pastor_user_id: string
+          reason?: string | null
+          site_id: string
+          starts_at: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          id?: string
+          location?: string | null
+          member_id?: string | null
+          organization_id?: string
+          pastor_user_id?: string
+          reason?: string | null
+          site_id?: string
+          starts_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pastoral_appointment_slots_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pastoral_appointment_slots_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pastoral_appointment_slots_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pastoral_records: {
+        Row: {
+          assigned_to: string | null
+          category: string
+          created_at: string
+          created_by: string
+          follow_up_date: string | null
+          id: string
+          member_id: string
+          notes: string
+          organization_id: string
+          site_id: string
+          status: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          category?: string
+          created_at?: string
+          created_by: string
+          follow_up_date?: string | null
+          id?: string
+          member_id: string
+          notes: string
+          organization_id: string
+          site_id: string
+          status?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string
+          follow_up_date?: string | null
+          id?: string
+          member_id?: string
+          notes?: string
+          organization_id?: string
+          site_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pastoral_records_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pastoral_records_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pastoral_records_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       permissions: {
         Row: {
           code: string
@@ -1019,6 +2157,48 @@ export type Database = {
           },
         ]
       }
+      rooms: {
+        Row: {
+          capacity: number | null
+          created_at: string
+          id: string
+          name: string
+          organization_id: string
+          site_id: string
+        }
+        Insert: {
+          capacity?: number | null
+          created_at?: string
+          id?: string
+          name: string
+          organization_id: string
+          site_id: string
+        }
+        Update: {
+          capacity?: number | null
+          created_at?: string
+          id?: string
+          name?: string
+          organization_id?: string
+          site_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rooms_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rooms_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sites: {
         Row: {
           address: string | null
@@ -1127,8 +2307,11 @@ export type Database = {
           description: string | null
           expense_id: string | null
           id: string
+          is_reconciled: boolean
           occurred_on: string
           organization_id: string
+          reconciled_at: string | null
+          reconciled_by: string | null
           site_id: string
           status: Database["public"]["Enums"]["transaction_status"]
           type: string
@@ -1144,8 +2327,11 @@ export type Database = {
           description?: string | null
           expense_id?: string | null
           id?: string
+          is_reconciled?: boolean
           occurred_on: string
           organization_id: string
+          reconciled_at?: string | null
+          reconciled_by?: string | null
           site_id: string
           status?: Database["public"]["Enums"]["transaction_status"]
           type: string
@@ -1161,8 +2347,11 @@ export type Database = {
           description?: string | null
           expense_id?: string | null
           id?: string
+          is_reconciled?: boolean
           occurred_on?: string
           organization_id?: string
+          reconciled_at?: string | null
+          reconciled_by?: string | null
           site_id?: string
           status?: Database["public"]["Enums"]["transaction_status"]
           type?: string
@@ -1219,6 +2408,74 @@ export type Database = {
           },
         ]
       }
+      volunteer_slots: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          department_id: string
+          id: string
+          member_id: string | null
+          organization_id: string
+          position_order: number
+          service_date: string
+          site_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          department_id: string
+          id?: string
+          member_id?: string | null
+          organization_id: string
+          position_order?: number
+          service_date: string
+          site_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          department_id?: string
+          id?: string
+          member_id?: string | null
+          organization_id?: string
+          position_order?: number
+          service_date?: string
+          site_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "volunteer_slots_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_slots_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_slots_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_slots_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       budget_line_actuals: {
@@ -1244,24 +2501,49 @@ export type Database = {
         Args: { approve: boolean; target_expense_id: string }
         Returns: undefined
       }
-      create_donation: {
-        Args: {
-          target_account_id: string
-          target_amount: number
-          target_currency: string
-          target_fund_id: string
-          target_given_at: string
-          target_is_anonymous: boolean
-          target_member_id: string
-          target_method: string
-          target_org_id: string
-          target_site_id: string
-        }
-        Returns: string
+      cancel_carpool_request: {
+        Args: { target_request_id: string }
+        Returns: undefined
       }
+      create_donation:
+        | {
+            Args: {
+              target_account_id: string
+              target_amount: number
+              target_currency: string
+              target_fund_id: string
+              target_given_at: string
+              target_is_anonymous: boolean
+              target_member_id: string
+              target_method: string
+              target_org_id: string
+              target_site_id: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              target_account_id: string
+              target_amount: number
+              target_currency: string
+              target_fund_id: string
+              target_given_at: string
+              target_is_anonymous: boolean
+              target_is_recurring?: boolean
+              target_member_id: string
+              target_method: string
+              target_org_id: string
+              target_site_id: string
+            }
+            Returns: string
+          }
       create_organization: {
         Args: { org_currency?: string; org_name: string; org_timezone?: string }
         Returns: string
+      }
+      generate_annual_receipts: {
+        Args: { target_org_id: string; target_year: number }
+        Returns: number
       }
       has_permission: {
         Args: { org_id: string; perm_code: string }
@@ -1276,6 +2558,19 @@ export type Database = {
         Returns: string
       }
       is_org_member: { Args: { org_id: string }; Returns: boolean }
+      is_pastoral_appointment_manager: {
+        Args: { org_id: string }
+        Returns: boolean
+      }
+      is_super_admin: { Args: never; Returns: boolean }
+      mark_carpool_request_checkin: {
+        Args: {
+          boarded: boolean
+          is_no_show: boolean
+          target_request_id: string
+        }
+        Returns: undefined
+      }
       mark_expense_paid: {
         Args: {
           occurred_on: string
@@ -1285,6 +2580,18 @@ export type Database = {
         Returns: string
       }
       next_receipt_number: { Args: { target_org_id: string }; Returns: string }
+      request_carpool_seat: {
+        Args: {
+          request_message?: string
+          seats: number
+          target_ride_id: string
+        }
+        Returns: string
+      }
+      respond_carpool_request: {
+        Args: { approve: boolean; target_request_id: string }
+        Returns: undefined
+      }
       seed_default_donation_funds: {
         Args: { target_org_id: string }
         Returns: undefined
@@ -1438,6 +2745,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       membership_status: ["invited", "active", "suspended"],

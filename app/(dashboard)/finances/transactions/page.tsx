@@ -16,7 +16,7 @@ export default async function TransactionsPage() {
       supabase
         .from("transactions")
         .select(
-          "id, occurred_on, description, type, amount, currency, accounts(name), transaction_categories(name)",
+          "id, occurred_on, description, type, amount, currency, is_reconciled, accounts(name), transaction_categories(name)",
         )
         .eq("organization_id", organizationId)
         .order("occurred_on", { ascending: false }),
@@ -39,6 +39,7 @@ export default async function TransactionsPage() {
     type: t.type,
     amount: Number(t.amount),
     currency: t.currency,
+    isReconciled: t.is_reconciled,
   }));
 
   return (
@@ -54,7 +55,7 @@ export default async function TransactionsPage() {
           />
         }
       />
-      <TransactionsList rows={rows} />
+      <TransactionsList organizationId={organizationId} rows={rows} />
     </div>
   );
 }

@@ -3,12 +3,15 @@ import { notFound } from "next/navigation";
 import { PencilIcon } from "lucide-react";
 import { PageHeader } from "@/components/patterns/page-header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EventTypeBadge } from "@/components/patterns/event-type-badge";
 import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/session";
 import { formatDateTime } from "@/lib/format";
 import { StatusSelect } from "./status-select";
+import { ServiceItemsPanel } from "./service-items-panel";
+import { RegistrationsPanel } from "./registrations-panel";
+import { CarpoolPanel } from "./carpool-panel";
 
 export default async function EventDetailPage({
   params,
@@ -16,18 +19,36 @@ export default async function EventDetailPage({
   const { id } = await params;
   const session = await getSession();
   if (!session) return null;
+  const organizationId = session.activeOrg.organizationId;
 
   const supabase = await createClient();
   const { data: event } = await supabase
     .from("events")
     .select(
-      "id, title, description, location, starts_at, ends_at, capacity, status, event_types(label_fr, color), departments(name)",
+      "id, title, description, location, starts_at, ends_at, capacity, status, event_types(label_fr, color), departments(name), rooms(name)",
     )
     .eq("id", id)
-    .eq("organization_id", session.activeOrg.organizationId)
+    .eq("organization_id", organizationId)
     .maybeSingle();
 
   if (!event) notFound();
+
+  const [{ data: serviceItems }, { data: registrationTracks }, { data: carpoolRides }] = await Promise.all([
+    supabase
+      .from("event_service_items")
+      .select("id, starts_at, title, owner_name")
+      .eq("event_id", event.id)
+      .order("starts_at"),
+    supabase
+      .from("event_registration_tracks")
+      .select("id, label, capacity, registered_count")
+      .eq("event_id", event.id)
+      .order("created_at"),
+    supabase
+      .from("carpool_rides")
+      .select("seat_capacity, seats_available")
+      .eq("event_id", event.id),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -66,6 +87,10 @@ export default async function EventDetailPage({
               <p className="text-sm text-foreground">{formatDateTime(event.ends_at)}</p>
             </div>
             <div>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Salle</p>
+              <p className="text-sm text-foreground">{event.rooms?.name ?? "—"}</p>
+            </div>
+            <div>
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Lieu</p>
               <p className="text-sm text-foreground">{event.location || "—"}</p>
             </div>
@@ -87,11 +112,57 @@ export default async function EventDetailPage({
       <div className="flex items-center gap-3">
         <span className="text-sm text-muted-foreground">Statut :</span>
         <StatusSelect
-          organizationId={session.activeOrg.organizationId}
+          organizationId={organizationId}
           eventId={event.id}
           status={event.status}
         />
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Déroulé du culte</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ServiceItemsPanel
+            organizationId={organizationId}
+            eventId={event.id}
+            eventStartsAt={event.starts_at}
+            items={(serviceItems ?? []).map((item) => ({
+              id: item.id,
+              startsAt: item.starts_at,
+              title: item.title,
+              ownerName: item.owner_name,
+            }))}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Inscriptions ouvertes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <RegistrationsPanel
+            organizationId={organizationId}
+            eventId={event.id}
+            tracks={(registrationTracks ?? []).map((track) => ({
+              id: track.id,
+              label: track.label,
+              capacity: track.capacity,
+              registeredCount: track.registered_count,
+            }))}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Covoiturage</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <CarpoolPanel eventId={event.id} rides={carpoolRides ?? []} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

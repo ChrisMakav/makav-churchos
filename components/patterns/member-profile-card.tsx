@@ -14,6 +14,7 @@ export interface MemberProfileData {
   genderLabel?: string | null;
   familyName?: string | null;
   familyRoleLabel?: string | null;
+  portalActive?: boolean;
 }
 
 function initialsFrom(name: string) {
@@ -49,9 +50,14 @@ export function MemberProfileCard({
           </Avatar>
           <div>
             <CardTitle className="font-heading text-2xl">{member.fullName}</CardTitle>
-            <Badge variant="outline" className="mt-1">
-              {member.statusLabel}
-            </Badge>
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              <Badge variant="outline">{member.statusLabel}</Badge>
+              {member.portalActive !== undefined ? (
+                <Badge variant={member.portalActive ? "secondary" : "outline"}>
+                  Portail membre {member.portalActive ? "actif" : "non activé"}
+                </Badge>
+              ) : null}
+            </div>
           </div>
         </div>
         {actions}
