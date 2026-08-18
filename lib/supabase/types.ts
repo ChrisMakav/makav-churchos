@@ -885,6 +885,72 @@ export type Database = {
           },
         ]
       }
+      communications: {
+        Row: {
+          body: string
+          channel: string
+          created_at: string
+          created_by: string | null
+          id: string
+          organization_id: string
+          recipient_count: number
+          scheduled_at: string | null
+          segment_summary: string
+          segments: Json
+          sent_at: string | null
+          site_id: string
+          status: string
+          title: string
+        }
+        Insert: {
+          body: string
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          organization_id: string
+          recipient_count?: number
+          scheduled_at?: string | null
+          segment_summary: string
+          segments?: Json
+          sent_at?: string | null
+          site_id: string
+          status?: string
+          title: string
+        }
+        Update: {
+          body?: string
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          organization_id?: string
+          recipient_count?: number
+          scheduled_at?: string | null
+          segment_summary?: string
+          segments?: Json
+          sent_at?: string | null
+          site_id?: string
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "communications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "communications_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       department_members: {
         Row: {
           department_id: string
@@ -1793,6 +1859,7 @@ export type Database = {
       notifications: {
         Row: {
           body: string | null
+          communication_id: string | null
           created_at: string
           id: string
           link: string | null
@@ -1804,6 +1871,7 @@ export type Database = {
         }
         Insert: {
           body?: string | null
+          communication_id?: string | null
           created_at?: string
           id?: string
           link?: string | null
@@ -1815,6 +1883,7 @@ export type Database = {
         }
         Update: {
           body?: string | null
+          communication_id?: string | null
           created_at?: string
           id?: string
           link?: string | null
@@ -1825,6 +1894,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "notifications_communication_id_fkey"
+            columns: ["communication_id"]
+            isOneToOne: false
+            referencedRelation: "communications"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "notifications_organization_id_fkey"
             columns: ["organization_id"]

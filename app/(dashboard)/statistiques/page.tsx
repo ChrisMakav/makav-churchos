@@ -31,7 +31,7 @@ export default async function StatistiquesPage() {
     menCount: r.men_count,
     teensCount: r.teens_count,
     childrenCount: r.children_count,
-    totalCount: r.total_count,
+    totalCount: r.total_count ?? 0,
     newPeopleCount: r.new_people_count,
   }));
 
