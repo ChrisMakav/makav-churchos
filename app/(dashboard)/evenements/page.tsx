@@ -21,9 +21,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/session";
 import { toUtcDayKey, toUtcTimeLabel } from "@/lib/format";
+import { UNASSIGNED_ROOM_KEY } from "@/lib/validation/events";
 import { ConflictsPanel, type ResourceConflict } from "./conflicts-panel";
+import { WeekGrid } from "./week-grid";
 
-const UNASSIGNED_KEY = "__unassigned__";
+const UNASSIGNED_KEY = UNASSIGNED_ROOM_KEY;
 
 interface EventWithJoins {
   id: string;
@@ -93,15 +95,24 @@ export default async function EvenementsPage({
     ...(hasUnassigned ? [{ key: UNASSIGNED_KEY, label: "Sans salle", capacity: null }] : []),
   ];
 
-  const eventsByRowDay = new Map<string, Map<string, EventWithJoins[]>>();
-  for (const event of eventList) {
-    const rowKey = rowKeyFor(event);
-    const dayKey = toUtcDayKey(event.starts_at);
-    if (!eventsByRowDay.has(rowKey)) eventsByRowDay.set(rowKey, new Map());
-    const dayMap = eventsByRowDay.get(rowKey)!;
-    if (!dayMap.has(dayKey)) dayMap.set(dayKey, []);
-    dayMap.get(dayKey)!.push(event);
-  }
+  const gridEvents = eventList.map((event) => ({
+    id: event.id,
+    title: event.title,
+    startsAt: event.starts_at,
+    endsAt: event.ends_at,
+    color: event.event_types?.color ?? "#8a7b68",
+    rowKey: rowKeyFor(event),
+    dayKey: toUtcDayKey(event.starts_at),
+  }));
+
+  const gridDays = days.map((day) => ({
+    key: format(day, "yyyy-MM-dd"),
+    label: format(day, "EEE", { locale: fr }),
+    dayNumber: format(day, "d"),
+    isToday: isToday(day),
+  }));
+
+  const canEditEvents = session.activeOrg.permissions.includes("events.write");
 
   // Conflits : deux événements sur la même vraie salle (room_id) dont les
   // créneaux se chevauchent.
@@ -223,70 +234,13 @@ export default async function EvenementsPage({
           </CardContent>
         </Card>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-border bg-card">
-          <div className="min-w-[900px]">
-            <div
-              className="grid border-b border-border bg-muted/40"
-              style={{ gridTemplateColumns: "160px repeat(7, minmax(0, 1fr))" }}
-            >
-              <div className="px-3 py-2 text-xs font-medium uppercase text-muted-foreground">
-                Salle
-              </div>
-              {days.map((day) => (
-                <div
-                  key={day.toISOString()}
-                  className="border-l border-border px-3 py-2 text-xs font-medium uppercase text-muted-foreground"
-                >
-                  {format(day, "EEE", { locale: fr })}{" "}
-                  <span className={isToday(day) ? "text-primary" : undefined}>
-                    {format(day, "d")}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {rows.map((row) => (
-              <div
-                key={row.key}
-                className="grid border-b border-border last:border-b-0"
-                style={{ gridTemplateColumns: "160px repeat(7, minmax(0, 1fr))" }}
-              >
-                <div className="px-3 py-2">
-                  <p className="text-sm font-medium text-foreground">{row.label}</p>
-                  {row.capacity != null ? (
-                    <p className="text-xs text-muted-foreground">Capacité {row.capacity}</p>
-                  ) : null}
-                </div>
-                {days.map((day) => {
-                  const dayKey = format(day, "yyyy-MM-dd");
-                  const cellEvents = eventsByRowDay.get(row.key)?.get(dayKey) ?? [];
-                  return (
-                    <div key={dayKey} className="min-h-20 space-y-1 border-l border-border p-1.5">
-                      {cellEvents.map((event) => {
-                        const color = event.event_types?.color ?? "#8a7b68";
-                        return (
-                          <Link
-                            key={event.id}
-                            href={`/evenements/${event.id}`}
-                            className="block rounded-md border-l-[3px] px-2 py-1 text-left"
-                            style={{ borderLeftColor: color, backgroundColor: `${color}1f` }}
-                          >
-                            <p className="text-[11px] text-muted-foreground">
-                              {toUtcTimeLabel(event.starts_at)} – {toUtcTimeLabel(event.ends_at)}
-                            </p>
-                            <p className="truncate text-xs font-medium text-foreground">
-                              {event.title}
-                            </p>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
-        </div>
+        <WeekGrid
+          organizationId={organizationId}
+          rows={rows}
+          days={gridDays}
+          events={gridEvents}
+          canEdit={canEditEvents}
+        />
       )}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">

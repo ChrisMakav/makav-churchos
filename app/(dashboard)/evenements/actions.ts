@@ -11,6 +11,7 @@ import {
   registrationTrackFormSchema,
   roomFormSchema,
   serviceItemFormSchema,
+  UNASSIGNED_ROOM_KEY,
 } from "@/lib/validation/events";
 
 export interface EventFormState {
@@ -136,6 +137,69 @@ export async function updateEvent(
   revalidatePath("/evenements");
   revalidatePath(`/evenements/${eventId}`);
   redirect(`/evenements/${eventId}`);
+}
+
+export interface MoveEventResult {
+  error?: string;
+}
+
+// Déplacement par glisser-déposer dans la grille hebdomadaire (rowKey =
+// room_id réel, "loc:<texte>" pour une location libre existante, ou
+// UNASSIGNED_ROOM_KEY). Conserve l'heure et la durée d'origine, change
+// uniquement le jour + la salle/location.
+export async function moveEvent(
+  organizationId: string,
+  eventId: string,
+  targetRowKey: string,
+  targetDayKey: string,
+): Promise<MoveEventResult> {
+  try {
+    await requirePermission(organizationId, "events.write");
+  } catch {
+    return { error: "Vous n'avez pas la permission de déplacer cet événement." };
+  }
+
+  const supabase = await createClient();
+  const { data: current, error: fetchError } = await supabase
+    .from("events")
+    .select("starts_at, ends_at")
+    .eq("id", eventId)
+    .eq("organization_id", organizationId)
+    .single();
+
+  if (fetchError || !current) {
+    return { error: "Événement introuvable." };
+  }
+
+  const durationMs = new Date(current.ends_at).getTime() - new Date(current.starts_at).getTime();
+  const oldStart = new Date(current.starts_at);
+  const newStart = new Date(`${targetDayKey}T00:00:00.000Z`);
+  newStart.setUTCHours(oldStart.getUTCHours(), oldStart.getUTCMinutes(), oldStart.getUTCSeconds(), 0);
+  const newEnd = new Date(newStart.getTime() + durationMs);
+
+  const isRealRoom = targetRowKey !== UNASSIGNED_ROOM_KEY && !targetRowKey.startsWith("loc:");
+  const roomId = isRealRoom ? targetRowKey : null;
+  const location = targetRowKey.startsWith("loc:") ? targetRowKey.slice(4) : null;
+
+  const { error } = await supabase
+    .from("events")
+    .update({
+      starts_at: newStart.toISOString(),
+      ends_at: newEnd.toISOString(),
+      room_id: roomId,
+      location,
+    })
+    .eq("id", eventId)
+    .eq("organization_id", organizationId);
+
+  if (error) {
+    console.error("moveEvent", error);
+    return { error: "Impossible de déplacer l'événement." };
+  }
+
+  revalidatePath("/evenements");
+  revalidatePath(`/evenements/${eventId}`);
+  return {};
 }
 
 export async function setEventStatus(organizationId: string, eventId: string, status: string) {

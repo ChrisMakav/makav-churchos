@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+// Clé de ligne pour les événements sans room_id ni location — grille
+// hebdomadaire par salle (evenements/page.tsx, week-grid.tsx, actions.ts).
+export const UNASSIGNED_ROOM_KEY = "__unassigned__";
+
 export const EVENT_STATUSES = ["scheduled", "cancelled", "completed"] as const;
 
 export const EVENT_STATUS_OPTIONS = [
