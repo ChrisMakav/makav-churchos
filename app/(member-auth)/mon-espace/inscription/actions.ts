@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteOrigin } from "@/lib/site-url";
 
 export interface MemberInscriptionState {
   error?: string;
@@ -30,7 +31,11 @@ export async function memberSignUp(
   }
 
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: `${await getSiteOrigin()}/mon-espace/connexion` },
+  });
 
   if (error) {
     return { error: "Impossible de créer le compte. Cet email est peut-être déjà utilisé." };
