@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -100,10 +101,12 @@ export function MemberShell({
             }
           />
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>
-              <span className="block truncate text-sm font-medium">{fullName}</span>
-              <span className="block truncate text-xs font-normal text-muted-foreground">{email}</span>
-            </DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>
+                <span className="block truncate text-sm font-medium">{fullName}</span>
+                <span className="block truncate text-xs font-normal text-muted-foreground">{email}</span>
+              </DropdownMenuLabel>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem render={<Link href="/mon-espace/profil" />}>Mon profil</DropdownMenuItem>
             <DropdownMenuSeparator />
